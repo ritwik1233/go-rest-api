@@ -8,98 +8,95 @@ import (
 	"../handlermethods"
 )
 
-func writeResponse(w *http.ResponseWriter, message, headerKey, headerValue string) {
-	(*w).Header().Set(headerKey, headerValue)
-	(*w).Write([]byte(message))
-}
 func CreateMessageHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
-		jsonstring := "{\"message\":\"Unauthorized User\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"Unauthorized User\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
 	userDetails, err := handlermethods.GetSession(sessionValue)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(401)
-		jsonstring := "{\"message\":\"Unauthorized User\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
 	message := req.FormValue("message")
-	res, err := handlermethods.CreateMessage(message, userDetails.Email)
+	_, err = handlermethods.CreateMessage(message, userDetails.Email)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
-		jsonstring := "{\"message\":\"Internal Server Error\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
-	fmt.Println(res)
-	jsonstring := "{\"message\":\"Message Created Successfully\"}"
-	writeResponse(&w, jsonstring, "Content-Type", "application/json")
+	responsemessage := "{\"result\":\"Message Created Successfully\"}"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(responsemessage))
 }
 func GetAllMessageHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
-		jsonstring := "{\"message\":\"Unauthorized User\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"Unauthorized User\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
 	userDetails, err := handlermethods.GetSession(sessionValue)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(401)
-		jsonstring := "{\"message\":\"Unauthorized User\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
 	message, err := handlermethods.GetMessage(userDetails.Email)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
-		jsonstring := "{\"message\":\"Internal Server Error\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
 	messageData, err := json.Marshal(message)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
-		jsonstring := "{\"message\":\"Internal Server Error\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
-	jsonstring := "{\"result\":" + string(messageData) + "\"}"
-	writeResponse(&w, jsonstring, "Content-Type", "application/json")
+	responsemessage := "{\"result\":" + string(messageData) + "\"}"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(responsemessage))
 }
 func DeleteMessageHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
-		jsonstring := "{\"message\":\"Unauthorized User\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"Unauthorized User\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
 	query := req.URL.Query().Get("messageId")
 	if len(query) == 0 {
 		w.WriteHeader(500)
-		jsonstring := "{\"message\":\"Internal Server Error\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"Internal Server Error\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
 	result, err := handlermethods.DeleteMessage(query)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
-		jsonstring := "{\"message\":\"Unauthorized User\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
-	fmt.Println(result)
-	jsonstring := "{\"message\":\"" + result + "\"}"
-	writeResponse(&w, jsonstring, "Content-Type", "application/json")
+	responsemessage := "{\"result\":\"" + result + "\"}"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(responsemessage))
 }

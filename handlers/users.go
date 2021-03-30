@@ -11,18 +11,25 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 	email := req.FormValue("email")
 	password := req.FormValue("password")
 	message, err := handlermethods.CheckLoginCredentials(email, password)
-	var jsonstring string
+	var responsemessage string
 	if err != nil {
+		w.WriteHeader(404)
 		fmt.Println("Error Logging in", err)
-		jsonstring = "{\"message\":\"Login Failed\"}"
+		responsemessage = "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
+		return
 	}
 	sessionValue, err := handlermethods.CreateSession(email, "session123")
 	if err != nil {
+		w.WriteHeader(404)
 		fmt.Println("Error Logging in", err)
-		jsonstring = "{\"message\":\"Login Failed\"}"
+		responsemessage = "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
+		return
 	}
-	jsonstring = "{\"message\":\"" + message + "\",\"auth\":\"" + sessionValue + "\"}"
-	writeResponse(&w, jsonstring, "Content-Type", "application/json")
+	responsemessage = "{\"message\":\"" + message + "\",\"auth\":\"" + sessionValue + "\"}"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(responsemessage))
 }
 func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 	email := req.FormValue("email")
@@ -32,30 +39,31 @@ func RegisterHandler(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		fmt.Println("Error Registering User", err)
 		w.WriteHeader(500)
-		jsonstring := "{\"message\":\" Internal Server Error \"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
-	jsonstring := "{\"message\":\"" + message + "\"}"
-	writeResponse(&w, jsonstring, "Content-Type", "application/json")
+	responsemessage := "{\"result\":\"" + message + "\"}"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(responsemessage))
 }
 func LogoutHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
-		jsonstring := "{\"message\":\"Unauthorized User\"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"Unauthorized User\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
-	res, err := handlermethods.DeleteSession(sessionValue)
+	_, err := handlermethods.DeleteSession(sessionValue)
 	if err != nil {
 		fmt.Println("Error Deleting Session", err)
 		w.WriteHeader(500)
-		jsonstring := "{\"message\":\" Internal Server Error \"}"
-		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
+		w.Write([]byte(responsemessage))
 		return
 	}
-	fmt.Println(res)
-	jsonstring := "{\"message\":\"Logout Successfull\"}"
-	writeResponse(&w, jsonstring, "Content-Type", "application/json")
+	responsemessage := "{\"result\":\"Logout Successfull\"}"
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(responsemessage))
 }

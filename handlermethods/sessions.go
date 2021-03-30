@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"time"
 
@@ -28,7 +29,7 @@ func CreateSession(message, key string) (string, error) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	collection := client.Database("gotest").Collection("session")
 	// check if session exists
@@ -42,13 +43,13 @@ func CreateSession(message, key string) (string, error) {
 			res, err := collection.InsertOne(ctx, bson.M{"value": result, "email": message, "createdDate": time})
 			if err != nil {
 				fmt.Println("Error encrypting document", err)
-				return "", err
+				return "", errors.New("internal server error")
 			}
 			fmt.Println("Session creation Successfull", res)
-			return result, err
+			return result, nil
 		} else {
 			fmt.Println("Error encrypting document", err)
-			return "", err
+			return "", errors.New("internal server error")
 		}
 	}
 	fmt.Println("Session already exists")
@@ -62,14 +63,14 @@ func GetSession(sesssionValue string) (SessionCollection, error) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
-		return result, err
+		return result, errors.New("internal server error")
 	}
 	collection := client.Database("gotest").Collection("session")
 	filter := bson.M{"value": sesssionValue}
 	err = collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		fmt.Println("Error authencticating session", err)
-		return result, err
+		return result, errors.New("unauthorised user")
 	}
 	return result, nil
 }
@@ -80,22 +81,20 @@ func DeleteSession(sesssionValue string) (string, error) {
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	_, err = GetSession(sesssionValue)
 	if err != nil {
 		fmt.Println("Error authenticating Session", err)
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	collection := client.Database("gotest").Collection("session")
 	filter := bson.M{"value": sesssionValue}
 	res, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		fmt.Println("Error deleting session", err)
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	fmt.Println("Session deletion Sucessfull", res)
 	return "Session deletion Sucessfull", nil
 }
-
-/******Session Functions END****/
