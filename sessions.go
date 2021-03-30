@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 /******Session Functions START****/
@@ -16,9 +20,17 @@ type SessionCollection struct {
 	CreatedDate time.Time `bson:"createdDate"`
 }
 
-func createSession(message, key string) (string, error) {
+func createHash(key string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(key))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func CreateSession(message, key string) (string, error) {
 	result := createHash(message)
-	client, err := ConnectDB()
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
 		return "", err
@@ -27,8 +39,6 @@ func createSession(message, key string) (string, error) {
 	// check if session exists
 	var sessionData SessionCollection
 	filter := bson.M{"email": message}
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
 	err = collection.FindOne(ctx, filter).Decode(&sessionData)
 	if err != nil {
 		// if session does not exists create new session
@@ -50,17 +60,17 @@ func createSession(message, key string) (string, error) {
 	return result, nil
 }
 
-func getSession(sesssionValue string) (SessionCollection, error) {
+func GetSession(sesssionValue string) (SessionCollection, error) {
 	var result SessionCollection
-	client, err := ConnectDB()
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
 		return result, err
 	}
 	collection := client.Database("gotest").Collection("session")
 	filter := bson.M{"value": sesssionValue}
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
 	err = collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		fmt.Println("Error authencticating session", err)
@@ -69,21 +79,21 @@ func getSession(sesssionValue string) (SessionCollection, error) {
 	return result, nil
 }
 
-func deleteSession(sesssionValue string) (string, error) {
-	client, err := ConnectDB()
+func DeleteSession(sesssionValue string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
 		return "", err
 	}
-	_, err = getSession(sesssionValue)
+	_, err = GetSession(sesssionValue)
 	if err != nil {
 		fmt.Println("Error authenticating Session", err)
 		return "", err
 	}
 	collection := client.Database("gotest").Collection("session")
 	filter := bson.M{"value": sesssionValue}
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
 	res, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		fmt.Println("Error deleting session", err)

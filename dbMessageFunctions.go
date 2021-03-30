@@ -7,6 +7,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 /******Message Functions Functions START****/
@@ -20,7 +22,7 @@ type MessageCollection struct {
 // create message
 func CreateMessage(message, email string) (string, error) {
 	time := time.Now()
-	client, err := ConnectDB()
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error Connecting to DB", err)
 		return "", nil
@@ -38,14 +40,14 @@ func CreateMessage(message, email string) (string, error) {
 // get message
 func GetMessage(email string) ([]MessageCollection, error) {
 	var messages []MessageCollection
-	client, err := ConnectDB()
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error Connecting to DB", err)
-		return messages, err
+		return messages, nil
 	}
 	collection := client.Database("gotest").Collection("message")
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
 	cursor, err := collection.Find(ctx, bson.M{"createdBy": email})
 	if err != nil {
 		fmt.Println("Error Getting data", err)
@@ -63,8 +65,10 @@ func GetMessage(email string) ([]MessageCollection, error) {
 }
 
 // delete message
-func deleteMessage(messageId string) (string, error) {
-	client, err := ConnectDB()
+func DeleteMessage(messageId string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
 		fmt.Println("Error Connecting to DB", err)
 		return "", nil

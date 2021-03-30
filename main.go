@@ -13,13 +13,13 @@ func writeResponse(w *http.ResponseWriter, message, headerKey, headerValue strin
 func loginHandler(w http.ResponseWriter, req *http.Request) {
 	email := req.FormValue("email")
 	password := req.FormValue("password")
-	message, err := checkLoginCredentials(email, password)
+	message, err := CheckLoginCredentials(email, password)
 	var jsonstring string
 	if err != nil {
 		fmt.Println("Error Logging in", err)
 		jsonstring = "{\"message\":\"Login Failed\"}"
 	}
-	sessionValue, err := createSession(email, "session123")
+	sessionValue, err := CreateSession(email, "session123")
 	if err != nil {
 		fmt.Println("Error Logging in", err)
 		jsonstring = "{\"message\":\"Login Failed\"}"
@@ -31,7 +31,14 @@ func registerHandler(w http.ResponseWriter, req *http.Request) {
 	email := req.FormValue("email")
 	password := req.FormValue("password")
 	username := req.FormValue("username")
-	message := registerUser(email, username, password)
+	message, err := RegisterUser(email, username, password)
+	if err != nil {
+		fmt.Println("Error Registering User", err)
+		w.WriteHeader(500)
+		jsonstring := "{\"message\":\" Internal Server Error \"}"
+		writeResponse(&w, jsonstring, "Content-Type", "application/json")
+		return
+	}
 	jsonstring := "{\"message\":\"" + message + "\"}"
 	writeResponse(&w, jsonstring, "Content-Type", "application/json")
 }
@@ -43,7 +50,7 @@ func logoutHandler(w http.ResponseWriter, req *http.Request) {
 		writeResponse(&w, jsonstring, "Content-Type", "application/json")
 		return
 	}
-	res, err := deleteSession(sessionValue)
+	res, err := DeleteSession(sessionValue)
 	if err != nil {
 		fmt.Println("Error Deleting Session", err)
 		w.WriteHeader(500)
@@ -63,7 +70,7 @@ func createMessageHandler(w http.ResponseWriter, req *http.Request) {
 		writeResponse(&w, jsonstring, "Content-Type", "application/json")
 		return
 	}
-	userDetails, err := getSession(sessionValue)
+	userDetails, err := GetSession(sessionValue)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(401)
@@ -92,7 +99,7 @@ func getAllMessageHandler(w http.ResponseWriter, req *http.Request) {
 		writeResponse(&w, jsonstring, "Content-Type", "application/json")
 		return
 	}
-	userDetails, err := getSession(sessionValue)
+	userDetails, err := GetSession(sessionValue)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(401)
@@ -134,7 +141,7 @@ func deleteMessageHandler(w http.ResponseWriter, req *http.Request) {
 		writeResponse(&w, jsonstring, "Content-Type", "application/json")
 		return
 	}
-	result, err := deleteMessage(query)
+	result, err := DeleteMessage(query)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)

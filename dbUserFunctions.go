@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 /******User Functions Functions START****/
@@ -16,17 +19,16 @@ type UserCollection struct {
 	Username string `bson:"username"`
 }
 
-func checkIfUserExists(email string) (UserCollection, error) {
+func GetUser(email string) (UserCollection, error) {
 	var result UserCollection
-	client, err := ConnectDB()
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
-		fmt.Println(err)
 		return result, err
 	}
 	collection := client.Database("gotest").Collection("users")
 	filter := bson.M{"email": email}
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
 	err = collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		noDocumentMessage := "mongo: no documents in result"
@@ -38,17 +40,16 @@ func checkIfUserExists(email string) (UserCollection, error) {
 	return result, nil
 }
 
-func checkLoginCredentials(email, password string) (string, error) {
-	client, err := ConnectDB()
+func CheckLoginCredentials(email, password string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	collection := client.Database("gotest").Collection("users")
 	var result UserCollection
 	filter := bson.M{"email": email, "password": password}
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
 	err = collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		fmt.Println("Error Decoding Document", err)
@@ -57,29 +58,28 @@ func checkLoginCredentials(email, password string) (string, error) {
 	return "Login Successfull", nil
 }
 
-func registerUser(email, username, password string) string {
-	client, err := ConnectDB()
+func RegisterUser(email, username, password string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
 	if err != nil {
-		fmt.Println(err)
-		return "Error Connecting to DB"
+		return "", err
 	}
 	collection := client.Database("gotest").Collection("users")
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	userDetails, err := checkIfUserExists(email)
+	userDetails, err := GetUser(email)
 	if err != nil {
 		fmt.Println("Error Checking document", err)
-		return "Internal Server Error"
+		return "", err
 	}
 	if userDetails.Email == email {
 		fmt.Println("User Already Exists")
-		return "User Already Exists"
+		return "", errors.New("user already exists")
 	}
 	res, err := collection.InsertOne(ctx, bson.M{"email": email, "username": username, "password": password})
 	if err != nil {
 		fmt.Println("Error Inserting document", err)
-		return "Error Inserting document"
+		return "", err
 	}
 	fmt.Println("Successful Registered user", res)
-	return "Successfully Registered user: " + userDetails.Email
+	return "Successfully Registered user: " + userDetails.Email, nil
 }

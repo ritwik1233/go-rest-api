@@ -1,2 +1,2 @@
 (sudo kill -9 `sudo lsof -t -i:9001` && sudo mongod --fork --logpath /var/log/mongod.log --port 9001 --dbpath /home/ritwik/data/db) || sudo mongod --fork --logpath /var/log/mongod.log --port 9001 --dbpath /home/ritwik/data/db
-go run main.go hashing.go sessions.go dbfunction.go dbUserFunctions.go dbMessageFunctions.go
+go run *.go
