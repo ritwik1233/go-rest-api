@@ -1,4 +1,4 @@
-package main
+package handlermethods
 
 import (
 	"context"
@@ -6,18 +6,13 @@ import (
 	"fmt"
 	"time"
 
+	"../models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-/******User Functions Functions START****/
-type UserCollection struct {
-	ID       string `bson:"_id"`
-	Email    string `bson:"email"`
-	Password string `bson:"password"`
-	Username string `bson:"username"`
-}
+type UserCollection = models.UserCollection
 
 func GetUser(email string) (UserCollection, error) {
 	var result UserCollection

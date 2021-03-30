@@ -1,23 +1,18 @@
-package main
+package handlermethods
 
 import (
 	"context"
 	"fmt"
 	"time"
 
+	"../models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-/******Message Functions Functions START****/
-type MessageCollection struct {
-	ID          string    `bson:"_id"`
-	Message     string    `bson:"message"`
-	CreatedBy   string    `bson:"createdBy"`
-	CreatedDate time.Time `bson:"createdDate"`
-}
+type MessageCollection = models.MessageCollection
 
 // create message
 func CreateMessage(message, email string) (string, error) {

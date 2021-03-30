@@ -1,4 +1,4 @@
-package main
+package handlermethods
 
 import (
 	"context"
@@ -7,18 +7,13 @@ import (
 	"fmt"
 	"time"
 
+	"../models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-/******Session Functions START****/
-type SessionCollection struct {
-	ID          string    `bson:"_id"`
-	Value       string    `bson:"value"`
-	Email       string    `bson:"email"`
-	CreatedDate time.Time `bson:"createdDate"`
-}
+type SessionCollection = models.SessionCollection
 
 func createHash(key string) string {
 	hasher := sha256.New()
