@@ -12,12 +12,12 @@ import (
 )
 
 /******Message Functions Functions START****/
-type MessageCollection struct {
-	ID          string    `bson:"_id"`
-	Message     string    `bson:"message"`
-	CreatedBy   string    `bson:"createdBy"`
-	CreatedDate time.Time `bson:"createdDate"`
-}
+// type MessageCollection struct {
+// 	ID          string    `bson:"_id"`
+// 	Message     string    `bson:"message"`
+// 	CreatedBy   string    `bson:"createdBy"`
+// 	CreatedDate time.Time `bson:"createdDate"`
+// }
 
 // create message
 func CreateMessage(message, email string) (string, error) {
