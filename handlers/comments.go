@@ -8,7 +8,7 @@ import (
 	"../handlermethods"
 )
 
-func CreateMessageHandler(w http.ResponseWriter, req *http.Request) {
+func CreateCommentHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
@@ -24,8 +24,9 @@ func CreateMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	message := req.FormValue("message")
-	_, err = handlermethods.CreateMessage(message, userDetails.Email)
+	comment := req.FormValue("comment")
+	messageId := req.FormValue("messageId")
+	_, err = handlermethods.CreateComment(comment, messageId, userDetails.Email)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
@@ -33,11 +34,11 @@ func CreateMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	responsemessage := "{\"result\":\"Message Created Successfully\"}"
+	responsemessage := "{\"result\":\"Comments Created Successfully\"}"
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responsemessage))
 }
-func GetAllMessageHandler(w http.ResponseWriter, req *http.Request) {
+func GetCommentsHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
@@ -45,7 +46,7 @@ func GetAllMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	userDetails, err := handlermethods.GetSession(sessionValue)
+	_, err := handlermethods.GetSession(sessionValue)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(401)
@@ -53,7 +54,14 @@ func GetAllMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	message, err := handlermethods.GetMessage(userDetails.Email)
+	messageId := req.URL.Query().Get("messageId")
+	if len(messageId) == 0 {
+		w.WriteHeader(500)
+		responsemessage := "{\"result\":\"Internal Server Error\"}"
+		w.Write([]byte(responsemessage))
+		return
+	}
+	message, err := handlermethods.GetComments(messageId)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
@@ -73,7 +81,7 @@ func GetAllMessageHandler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responsemessage))
 }
-func DeleteMessageHandler(w http.ResponseWriter, req *http.Request) {
+func DeleteCommentHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
@@ -81,14 +89,14 @@ func DeleteMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	queryId := req.URL.Query().Get("messageId")
+	queryId := req.URL.Query().Get("commentId")
 	if len(queryId) == 0 {
 		w.WriteHeader(500)
 		responsemessage := "{\"result\":\"Internal Server Error\"}"
 		w.Write([]byte(responsemessage))
 		return
 	}
-	result, err := handlermethods.DeleteMessage(queryId)
+	result, err := handlermethods.DeleteComment(queryId)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
@@ -100,8 +108,7 @@ func DeleteMessageHandler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responsemessage))
 }
-
-func UpdateMessageHandler(w http.ResponseWriter, req *http.Request) {
+func UpdateCommentHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
 		w.WriteHeader(401)
@@ -117,9 +124,9 @@ func UpdateMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	queryId := req.URL.Query().Get("messageId")
-	updatedmessage := req.FormValue("message")
-	_, err = handlermethods.UpdateMessage(queryId, updatedmessage)
+	queryId := req.URL.Query().Get("commentId")
+	updatedmessage := req.FormValue("comment")
+	_, err = handlermethods.UpdateComment(queryId, updatedmessage)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
@@ -127,7 +134,7 @@ func UpdateMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	responsemessage := "{\"result\":\"Message Updated Successfully\"}"
+	responsemessage := "{\"result\":\"Comment Updated Successfully\"}"
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responsemessage))
 }
