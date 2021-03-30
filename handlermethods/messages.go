@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"../models"
@@ -17,7 +18,7 @@ type MessageCollection = models.MessageCollection
 
 func CreateMessage(message, email string) (string, error) {
 	time := time.Now()
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		fmt.Println("Error Connecting to DB", err)
 		return "", errors.New("internal server error")
@@ -35,7 +36,7 @@ func GetMessage(email string) ([]MessageCollection, error) {
 	var messages []MessageCollection
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		fmt.Println("Error Connecting to DB", err)
 		return messages, errors.New("internal server error")
@@ -60,7 +61,7 @@ func GetMessage(email string) ([]MessageCollection, error) {
 func DeleteMessage(messageId string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		fmt.Println("Error Connecting to DB", err)
 		return "", errors.New("internal server error")
@@ -82,7 +83,7 @@ func DeleteMessage(messageId string) (string, error) {
 func UpdateMessage(messageId, updatedmessage string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		fmt.Println("Error Connecting to DB", err)
 		return "", errors.New("internal server error")

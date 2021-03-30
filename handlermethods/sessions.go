@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"../models"
@@ -22,11 +23,11 @@ func createHash(key string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func CreateSession(message, key string) (string, error) {
+func CreateSession(message string) (string, error) {
 	result := createHash(message)
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
 		return "", errors.New("internal server error")
@@ -60,7 +61,7 @@ func GetSession(sesssionValue string) (SessionCollection, error) {
 	var result SessionCollection
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
 		return result, errors.New("internal server error")
@@ -78,7 +79,7 @@ func GetSession(sesssionValue string) (SessionCollection, error) {
 func DeleteSession(sesssionValue string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		fmt.Println("Error connecting to Database", err)
 		return "", errors.New("internal server error")

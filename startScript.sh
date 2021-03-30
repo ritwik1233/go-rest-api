@@ -5,5 +5,7 @@ cd handlers && go build *.go
 cd ../
 cd handlermethods && go build *.go
 cd ../
-go build main.go
-./main
+cd dev && go build *.go
+cd ../
+
+ENV="DEV" go run main.go

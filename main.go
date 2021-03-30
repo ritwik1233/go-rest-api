@@ -1,11 +1,31 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
+	"./dev"
 	"./handlers"
 )
 
+func defaultHandler(w http.ResponseWriter, req *http.Request) {
+	w.Write([]byte("<h1>Default Page</h1>"))
+}
+
+func init() {
+	fmt.Println("Setting Environment Variable")
+	env := os.Getenv("ENV")
+	if env != "PROD" {
+		fmt.Println("Loading Dev Environment")
+		var devkeys dev.Keys
+		devkeys.Initialize()
+		os.Setenv("MONGOURI", devkeys.MongoURI)
+		os.Setenv("PORT", devkeys.PORT)
+		return
+	}
+	fmt.Println("Loading PROD Environment")
+}
 func main() {
 	http.HandleFunc("/api/login", handlers.LoginHandler)
 	http.HandleFunc("/api/register", handlers.RegisterHandler)
@@ -18,5 +38,8 @@ func main() {
 	http.HandleFunc("/api/getComments", handlers.GetCommentsHandler)
 	http.HandleFunc("/api/deleteComment", handlers.DeleteCommentHandler)
 	http.HandleFunc("/api/updateComment", handlers.UpdateCommentHandler)
-	http.ListenAndServe(":3000", nil)
+	http.HandleFunc("/", defaultHandler)
+	PORT := ":" + os.Getenv("PORT")
+	fmt.Println("Starting Server at PORT : ", os.Getenv("PORT"))
+	http.ListenAndServe(PORT, nil)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"../models"
@@ -18,7 +19,7 @@ func GetUser(email string) (UserCollection, error) {
 	var result UserCollection
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		return result, err
 	}
@@ -38,7 +39,7 @@ func GetUser(email string) (UserCollection, error) {
 func CheckLoginCredentials(email, password string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		return "", err
 	}
@@ -56,7 +57,7 @@ func CheckLoginCredentials(email, password string) (string, error) {
 func RegisterUser(email, username, password string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:9001"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
 		return "", err
 	}

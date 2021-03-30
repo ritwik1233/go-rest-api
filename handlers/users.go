@@ -19,7 +19,7 @@ func LoginHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	sessionValue, err := handlermethods.CreateSession(email, "session123")
+	sessionValue, err := handlermethods.CreateSession(email)
 	if err != nil {
 		w.WriteHeader(404)
 		fmt.Println("Error Logging in", err)
