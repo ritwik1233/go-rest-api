@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"../handlermethods"
+	"github.com/ritwik1233/go-rest-api/handlermethods"
 )
 
 func CreateMessageHandler(w http.ResponseWriter, req *http.Request) {

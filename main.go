@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"./dev"
-	"./handlers"
+	"github.com/ritwik1233/go-rest-api/dev"
+	"github.com/ritwik1233/go-rest-api/handlers"
 )
 
 func defaultHandler(w http.ResponseWriter, req *http.Request) {

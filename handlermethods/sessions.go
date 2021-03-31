@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"../models"
+	"github.com/ritwik1233/go-rest-api/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
