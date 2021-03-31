@@ -1,1 +1,1 @@
-web: gorest
+web: go-rest-api
