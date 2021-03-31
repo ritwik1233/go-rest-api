@@ -48,8 +48,13 @@ func CheckLoginCredentials(email, password string) (string, error) {
 	filter := bson.M{"email": email, "password": password}
 	err = collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
-		fmt.Println("Error Decoding Document", err)
-		return "", errors.New("internal server error")
+		noDocumentMessage := "mongo: no documents in result"
+		if err.Error() != noDocumentMessage {
+			fmt.Println("Error Checking document", err)
+			return "", errors.New("internal server error")
+		} else {
+			return "", errors.New("login failed: no user exists")
+		}
 	}
 	return "Login Successfull", nil
 }
