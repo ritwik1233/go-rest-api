@@ -21,7 +21,7 @@ func GetUser(email string) (UserCollection, error) {
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
-		return result, err
+		return result, errors.New("internal server error")
 	}
 	collection := client.Database("gotest").Collection("users")
 	filter := bson.M{"email": email}
@@ -30,7 +30,7 @@ func GetUser(email string) (UserCollection, error) {
 		noDocumentMessage := "mongo: no documents in result"
 		if err.Error() != noDocumentMessage {
 			fmt.Println("Error Checking document", err)
-			return result, err
+			return result, errors.New("internal server error")
 		}
 	}
 	return result, nil
@@ -41,7 +41,7 @@ func CheckLoginCredentials(email, password string) (string, error) {
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	collection := client.Database("gotest").Collection("users")
 	var result UserCollection
@@ -49,7 +49,7 @@ func CheckLoginCredentials(email, password string) (string, error) {
 	err = collection.FindOne(ctx, filter).Decode(&result)
 	if err != nil {
 		fmt.Println("Error Decoding Document", err)
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	return "Login Successfull", nil
 }
@@ -59,13 +59,13 @@ func RegisterUser(email, username, password string) (string, error) {
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
 	if err != nil {
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	collection := client.Database("gotest").Collection("users")
 	userDetails, err := GetUser(email)
 	if err != nil {
 		fmt.Println("Error Checking document", err)
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	if userDetails.Email == email {
 		fmt.Println("User Already Exists")
@@ -74,7 +74,7 @@ func RegisterUser(email, username, password string) (string, error) {
 	res, err := collection.InsertOne(ctx, bson.M{"email": email, "username": username, "password": password})
 	if err != nil {
 		fmt.Println("Error Inserting document", err)
-		return "", err
+		return "", errors.New("internal server error")
 	}
 	fmt.Println("Successful Registered user", res)
 	return "Successfully Registered user: " + userDetails.Email, nil
