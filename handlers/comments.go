@@ -71,7 +71,7 @@ func GetCommentsHandler(w http.ResponseWriter, req *http.Request) {
 	}
 	messageData, err := json.Marshal(message)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error Getting Data", err)
 		w.WriteHeader(500)
 		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
 		w.Write([]byte(responsemessage))

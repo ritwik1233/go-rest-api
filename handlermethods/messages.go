@@ -55,6 +55,10 @@ func GetMessage(email string) ([]MessageCollection, error) {
 		}
 		messages = append(messages, message)
 	}
+	if len(messages) == 0 {
+		fmt.Println("No Message exists")
+		return messages, errors.New("no messages exists")
+	}
 	return messages, nil
 }
 

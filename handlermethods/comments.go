@@ -65,6 +65,10 @@ func GetComments(messageId string) ([]CommentsCollection, error) {
 		}
 		comments = append(comments, comment)
 	}
+	if len(comments) == 0 {
+		fmt.Println("No data exists")
+		return comments, errors.New("no comments exists")
+	}
 	return comments, nil
 }
 
