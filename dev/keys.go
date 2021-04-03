@@ -8,5 +8,5 @@ type Keys struct {
 
 func (k *Keys) Initialize() {
 	(*k).MongoURI = "mongodb://localhost:9001"
-	(*k).PORT = "3000"
+	(*k).PORT = "5000"
 }

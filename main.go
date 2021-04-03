@@ -30,6 +30,7 @@ func main() {
 	http.HandleFunc("/api/login", handlers.LoginHandler)
 	http.HandleFunc("/api/register", handlers.RegisterHandler)
 	http.HandleFunc("/api/logout", handlers.LogoutHandler)
+	http.HandleFunc("/api/getCurrentUser", handlers.GetCurrenUser)
 	http.HandleFunc("/api/createMessage", handlers.CreateMessageHandler)
 	http.HandleFunc("/api/getAllMessage", handlers.GetAllMessageHandler)
 	http.HandleFunc("/api/deleteMessage", handlers.DeleteMessageHandler)
@@ -40,6 +41,6 @@ func main() {
 	http.HandleFunc("/api/updateComment", handlers.UpdateCommentHandler)
 	http.HandleFunc("/", defaultHandler)
 	PORT := ":" + os.Getenv("PORT")
-	fmt.Println("Starting Server at PORT : ", os.Getenv("PORT"))
+	fmt.Println("Starting Server at PORT:", os.Getenv("PORT"))
 	http.ListenAndServe(PORT, nil)
 }

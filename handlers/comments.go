@@ -39,21 +39,6 @@ func CreateCommentHandler(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte(responsemessage))
 }
 func GetCommentsHandler(w http.ResponseWriter, req *http.Request) {
-	sessionValue := req.Header.Get("Authorization")
-	if len(sessionValue) == 0 {
-		w.WriteHeader(401)
-		responsemessage := "{\"result\":\"Unauthorized User\"}"
-		w.Write([]byte(responsemessage))
-		return
-	}
-	_, err := handlermethods.GetSession(sessionValue)
-	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(401)
-		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
-		w.Write([]byte(responsemessage))
-		return
-	}
 	messageId := req.URL.Query().Get("messageId")
 	if len(messageId) == 0 {
 		w.WriteHeader(500)
@@ -77,7 +62,7 @@ func GetCommentsHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	responsemessage := "{\"result\":" + string(messageData) + "\"}"
+	responsemessage := "{\"result\":" + string(messageData) + "}"
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responsemessage))
 }

@@ -8,4 +8,4 @@ cd ../
 cd dev && go build *.go
 cd ../
 
-ENV="DEV" go run main.go
+ENV="DEV" go run main.go & cd client && npm start

@@ -23,13 +23,22 @@ func CreateComment(comment, messageId, createdBy string) (string, error) {
 		fmt.Println("Error Connecting to DB", err)
 		return "", errors.New("internal server error")
 	}
-	_id, err := primitive.ObjectIDFromHex(messageId)
+	messageid, err := primitive.ObjectIDFromHex(messageId)
 	if err != nil {
 		fmt.Println("Error Converting Id", err)
 		return "", errors.New("internal server error")
 	}
-	collection := client.Database("gotest").Collection("comments")
-	_, err = collection.InsertOne(context.TODO(), bson.M{"comment": comment, "messageId": _id, "createdBy": createdBy, "createdDate": time})
+	// check if message exists in db
+	collection := client.Database("gotest").Collection("message")
+	var messages models.MessageCollection
+	err = collection.FindOne(context.TODO(), bson.M{"_id": messageid}).Decode(&messages)
+	if err != nil {
+		fmt.Println("Error Inserting document", err)
+		return "", errors.New("internal server error")
+	}
+
+	collection = client.Database("gotest").Collection("comments")
+	_, err = collection.InsertOne(context.TODO(), bson.M{"comment": comment, "messageId": messageid, "createdBy": createdBy, "createdDate": time})
 	if err != nil {
 		fmt.Println("Error Inserting document", err)
 		return "", errors.New("internal server error")

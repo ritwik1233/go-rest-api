@@ -59,7 +59,7 @@ func CheckLoginCredentials(email, password string) (string, error) {
 	return "Login Successfull", nil
 }
 
-func RegisterUser(email, username, password string) (string, error) {
+func RegisterUser(email, password string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(os.Getenv("MONGOURI")))
@@ -76,7 +76,7 @@ func RegisterUser(email, username, password string) (string, error) {
 		fmt.Println("User Already Exists")
 		return "", errors.New("user already exists")
 	}
-	res, err := collection.InsertOne(ctx, bson.M{"email": email, "username": username, "password": password})
+	res, err := collection.InsertOne(ctx, bson.M{"email": email, "password": password})
 	if err != nil {
 		fmt.Println("Error Inserting document", err)
 		return "", errors.New("internal server error")

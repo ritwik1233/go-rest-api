@@ -32,7 +32,7 @@ func CreateMessage(message, email string) (string, error) {
 	return "Successfully Created Message", nil
 }
 
-func GetMessage(email string) ([]MessageCollection, error) {
+func GetAllMessage() ([]MessageCollection, error) {
 	var messages []MessageCollection
 	ctx, cancel := context.WithTimeout(context.TODO(), 20*time.Second)
 	defer cancel()
@@ -42,7 +42,7 @@ func GetMessage(email string) ([]MessageCollection, error) {
 		return messages, errors.New("internal server error")
 	}
 	collection := client.Database("gotest").Collection("message")
-	cursor, err := collection.Find(ctx, bson.M{"createdBy": email})
+	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
 		fmt.Println("Error Getting data", err)
 		return messages, errors.New("internal server error")
@@ -77,6 +77,13 @@ func DeleteMessage(messageId string) (string, error) {
 	}
 	collection := client.Database("gotest").Collection("message")
 	_, err = collection.DeleteOne(ctx, bson.M{"_id": _id})
+	if err != nil {
+		fmt.Println("Error Deleting document", err)
+		return "", errors.New("internal server error")
+	}
+	// delete comments if any
+	commentsCollection := client.Database("gotest").Collection("comments")
+	_, err = commentsCollection.DeleteMany(ctx, bson.M{"messageId": _id})
 	if err != nil {
 		fmt.Println("Error Deleting document", err)
 		return "", errors.New("internal server error")

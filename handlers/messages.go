@@ -38,22 +38,7 @@ func CreateMessageHandler(w http.ResponseWriter, req *http.Request) {
 	w.Write([]byte(responsemessage))
 }
 func GetAllMessageHandler(w http.ResponseWriter, req *http.Request) {
-	sessionValue := req.Header.Get("Authorization")
-	if len(sessionValue) == 0 {
-		w.WriteHeader(401)
-		responsemessage := "{\"result\":\"Unauthorized User\"}"
-		w.Write([]byte(responsemessage))
-		return
-	}
-	userDetails, err := handlermethods.GetSession(sessionValue)
-	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(401)
-		responsemessage := "{\"result\":\"" + err.Error() + "\"}"
-		w.Write([]byte(responsemessage))
-		return
-	}
-	message, err := handlermethods.GetMessage(userDetails.Email)
+	message, err := handlermethods.GetAllMessage()
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(500)
@@ -69,7 +54,7 @@ func GetAllMessageHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte(responsemessage))
 		return
 	}
-	responsemessage := "{\"result\":" + string(messageData) + "\"}"
+	responsemessage := "{\"result\":" + string(messageData) + "}"
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responsemessage))
 }
@@ -100,7 +85,6 @@ func DeleteMessageHandler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responsemessage))
 }
-
 func UpdateMessageHandler(w http.ResponseWriter, req *http.Request) {
 	sessionValue := req.Header.Get("Authorization")
 	if len(sessionValue) == 0 {
