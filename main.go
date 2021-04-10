@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ritwik1233/go-rest-api/dev"
 	"github.com/ritwik1233/go-rest-api/handlers"
 )
 
@@ -13,15 +12,15 @@ func init() {
 	fmt.Println("Setting Environment Variable")
 	env := os.Getenv("ENV")
 	if env != "PROD" {
-		fmt.Println("Loading Dev Environment")
-		var devkeys dev.Keys
-		devkeys.Initialize()
-		os.Setenv("MONGOURI", devkeys.MongoURI)
-		os.Setenv("PORT", devkeys.PORT)
+		fmt.Println("Loading DEV Environment")
+		os.Setenv("MONGOURI", "mongodb://localhost:9001")
+		os.Setenv("PORT", "5000")
 		return
+	} else {
+		fmt.Println("Loading PROD Environment")
 	}
-	fmt.Println("Loading PROD Environment")
 }
+
 func main() {
 	fs := http.FileServer(http.Dir("./client/build"))
 	http.Handle("/", fs)
