@@ -5,8 +5,8 @@ import PropTypes from "prop-types";
 function UpdateCommentComponet(props) {
   const handleCommentSubmit = (e) => {
     e.preventDefault();
-    let commentDetails = new FormData();
-    commentDetails.append("comment", e.target.message.value);
+    let commentDetails = {};
+    commentDetails.comment = e.target.message.value;
     props.updateComment(commentDetails, props.commentId);
   };
   return (
@@ -24,7 +24,7 @@ function UpdateCommentComponet(props) {
             label="Message"
             variant="outlined"
             required
-            defaultValue={props.Comment}
+            defaultValue={props.comment}
           />
         </Grid>
         <Grid item xs={1}></Grid>
@@ -43,14 +43,14 @@ function UpdateCommentComponet(props) {
 // type checking for props
 UpdateCommentComponet.propTypes = {
   commentId: PropTypes.string,
-  Comment: PropTypes.string,
+  comment: PropTypes.string,
   updateComment: PropTypes.func,
 };
 
 // setting default props
 UpdateCommentComponet.defaultProps = {
   commentId: "",
-  Comment: "",
+  comment: "",
   updateComment: () => {},
 };
 

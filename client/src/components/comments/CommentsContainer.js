@@ -25,7 +25,7 @@ function CommentsContainer(props) {
               <Grid
                 container
                 spacing={3}
-                key={comment.ID}
+                key={comment._id}
                 style={{ margin: "0px", padding: "0px" }}
               >
                 <Grid item xs={12} style={{ margin: "0px", padding: "0px" }}>
@@ -39,22 +39,22 @@ function CommentsContainer(props) {
                       xs={10}
                       style={{ margin: "0px", padding: "0px" }}
                     >
-                      {updateCommentId !== comment.ID ? (
+                      {updateCommentId !== comment._id ? (
                         <Typography
                           variant="caption"
                           style={{ margin: "0px", padding: "0px" }}
                         >
-                          {comment.Comment}
+                          {comment.comment}
                         </Typography>
                       ) : (
                         <UpdateCommentComponet
-                          commentId={comment.ID}
-                          Comment={comment.Comment}
+                          commentId={comment._id}
+                          comment={comment.comment}
                           updateComment={updateComment}
                         />
                       )}
                     </Grid>
-                    {props.userEmail === comment.CreatedBy && (
+                    {props.currentUserToken === comment.createdBy && (
                       <React.Fragment>
                         <Grid
                           item
@@ -66,7 +66,7 @@ function CommentsContainer(props) {
                             color="secondary"
                             size="small"
                             onClick={() => {
-                              props.deleteComment(comment.ID);
+                              props.deleteComment(comment._id);
                             }}
                           >
                             Delete
@@ -82,11 +82,11 @@ function CommentsContainer(props) {
                             color="primary"
                             size="small"
                             onClick={() => {
-                              if (updateCommentId === comment.ID) {
+                              if (updateCommentId === comment._id) {
                                 setUpdateCommentStatus(null);
                                 return;
                               }
-                              setUpdateCommentStatus(comment.ID);
+                              setUpdateCommentStatus(comment._id);
                             }}
                           >
                             Update
@@ -94,7 +94,7 @@ function CommentsContainer(props) {
                         </Grid>
                       </React.Fragment>
                     )}
-                    {updateCommentId !== comment.ID && (
+                    {updateCommentId !== comment._id && (
                       <React.Fragment>
                         <Grid
                           item
@@ -110,7 +110,7 @@ function CommentsContainer(props) {
                             variant="caption"
                             style={{ margin: "0px", padding: "0px" }}
                           >
-                            {comment.CreatedBy}
+                            {comment.createdBy}
                           </Typography>
                         </Grid>
                         <Grid
@@ -127,7 +127,7 @@ function CommentsContainer(props) {
                             variant="caption"
                             style={{ margin: "0px", padding: "0px" }}
                           >
-                            {comment.CreatedDate.toString()}
+                            {comment.createdDate.toString()}
                           </Typography>
                         </Grid>
                       </React.Fragment>
@@ -144,7 +144,7 @@ function CommentsContainer(props) {
       <Grid item xs={12}>
         &nbsp;
       </Grid>
-      {props.userEmail && (
+      {props.currentUserToken && (
         <CreateCommentComponent createComment={createComment} />
       )}
     </React.Fragment>
@@ -154,7 +154,7 @@ function CommentsContainer(props) {
 // type checking for props
 CommentsContainer.propTypes = {
   comments: PropTypes.arrayOf(Object),
-  userEmail: PropTypes.string,
+  currentUserToken: PropTypes.string,
   deleteComment: PropTypes.func,
   createComment: PropTypes.func,
   updateComment: PropTypes.func,
@@ -163,7 +163,7 @@ CommentsContainer.propTypes = {
 // setting default props
 CommentsContainer.defaultProps = {
   comments: [],
-  userEmail: null,
+  currentUserToken: null,
   deleteComment: () => {},
   createComment: () => {},
   updateComment: () => {},

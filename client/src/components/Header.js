@@ -14,7 +14,7 @@ import axios from "axios";
 import PropTypes from "prop-types";
 import Grid from "@material-ui/core/Grid";
 import { useDispatch } from "react-redux";
-import { logoutUser, loginUser } from "../actions/index";
+import { logoutUser, getCurrentUser } from "../actions/index";
 import LoginComponent from "./LoginComponent.js";
 import RegisterComponent from "./RegisterComponent.js";
 
@@ -22,39 +22,37 @@ function Header(props) {
   const dispatch = useDispatch();
   const [loginModal, setLoginModal] = React.useState(false);
   const [tabValue, setTabValue] = React.useState(0);
-  const [userEmail, setUserEmail] = React.useState(null);
-
-  React.useEffect(() => {
-    axios
-      .get("/api/getCurrentUser", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: props.currentUserToken,
-        },
-      })
-      .then((res) => {
-        setUserEmail(res.data.result);
-      })
-      .catch(() => {
-        setUserEmail(null);
-      });
-  }, [props.currentUserToken]);
   const handleClose = () => {
     setLoginModal(!loginModal);
   };
+
   const handleLogin = (userDetails) => {
-    dispatch(loginUser(userDetails));
-    setLoginModal(false);
+    console.log(userDetails);
+    axios
+      .post("/api/login", userDetails, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then(() => {
+        dispatch(getCurrentUser());
+        setLoginModal(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Login Failed");
+      });
   };
   const handleRegister = (userDetails) => {
-    axios({
-      method: "post",
-      url: "/api/register",
-      data: userDetails,
-      headers: { "Content-Type": "multipart/form-data" },
-    }).then(() => {
-      setLoginModal(false);
-    });
+    axios
+      .post("/api/register", userDetails, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then(() => {
+        setLoginModal(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Registration Failed");
+      });
   };
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -108,7 +106,7 @@ function Header(props) {
             <React.Fragment>
               <Grid item xs={1}>
                 <Typography variant="caption" style={{ marginTop: "20px" }}>
-                  {userEmail}
+                  {props.currentUserToken}
                 </Typography>
               </Grid>
               <Grid item xs={1}>

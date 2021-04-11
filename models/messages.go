@@ -1,10 +1,14 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type MessageCollection struct {
-	ID          string    `bson:"_id"`
-	Message     string    `bson:"message"`
-	CreatedBy   string    `bson:"createdBy"`
-	CreatedDate time.Time `bson:"createdDate"`
+	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Message     string             `json:"message,omitempty" bson:"message,omitempty"`
+	CreatedBy   string             `json:"createdBy,omitempty" bson:"createdBy,omitempty"`
+	CreatedDate time.Time          `json:"createdDate,omitempty" bson:"createdDate,omitempty"`
 }

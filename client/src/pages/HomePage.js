@@ -28,15 +28,12 @@ function HomePage(props) {
   };
 
   const handleMessage = (message) => {
-    axios({
-      method: "post",
-      url: "api/createMessage",
-      data: message,
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: props.currentUserToken,
-      },
-    })
+    axios
+      .post("api/createMessage", message, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then(() => {
         dispatch(getAllMessage());
         const createMessage = document.getElementById("create-message");
@@ -48,17 +45,15 @@ function HomePage(props) {
   };
 
   const deleteMessage = (messageId) => {
-    axios({
-      method: "delete",
-      url: "api/deleteMessage",
-      params: {
-        messageId,
-      },
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: props.currentUserToken,
-      },
-    })
+    axios
+      .delete("api/deleteMessage", {
+        params: {
+          messageId,
+        },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then(() => {
         dispatch(getAllMessage());
       })
@@ -68,15 +63,15 @@ function HomePage(props) {
   };
 
   const messageComponent = props.messages.map((message) => {
-    const formattedDate = new Date(message.CreatedDate);
-    const viewComments = message.ID === messageId;
+    const formattedDate = new Date(message.createdDate);
+    const viewComments = message._id === messageId;
     return (
       <MessageContainer
-        key={message.ID}
-        ID={message.ID}
-        Message={message.Message}
-        CreatedBy={message.CreatedBy}
-        CreatedDate={formattedDate}
+        key={message._id}
+        _id={message._id}
+        message={message.message}
+        createdBy={message.createdBy}
+        createdDate={formattedDate}
         getComments={getComments}
         deleteMessage={deleteMessage}
         viewComments={viewComments}

@@ -3,9 +3,5 @@ cd models && go build *.go
 cd ../
 cd handlers && go build *.go
 cd ../
-cd handlermethods && go build *.go
-cd ../
-cd dev && go build *.go
-cd ../
 
-ENV="DEV" go run main.go & cd client && npm start
+ENV="DEV" go run main.go  & cd client && npm start

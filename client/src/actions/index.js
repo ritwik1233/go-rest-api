@@ -11,7 +11,7 @@ export function getAllMessage() {
       .then((res) => {
         dispatch({
           type: "GET_ALL_MESSAGE",
-          payload: res.data.result,
+          payload: res.data || [],
         });
       })
       .catch((err) => {
@@ -38,7 +38,7 @@ export function getAllComments(messageId) {
       .then((res) => {
         dispatch({
           type: "GET_ALL_COMMENTS",
-          payload: res.data.result,
+          payload: res.data || [],
         });
       })
       .catch((err) => {
@@ -51,20 +51,23 @@ export function getAllComments(messageId) {
   };
 }
 
-export function loginUser(userDetails) {
+export function getCurrentUser() {
   return function (dispatch) {
-    axios({
-      method: "post",
-      url: "/api/login",
-      data: userDetails,
-      headers: { "Content-Type": "multipart/form-data" },
-    }).then((res) => {
-      const access_token = `${res.data.auth}`;
-      dispatch({
-        type: "LOGIN_USER",
-        payload: access_token,
+    axios
+      .get("/api/getuser", {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((res) => {
+        dispatch({
+          type: "GET_USER",
+          payload: res.data.email,
+        });
+      })
+      .catch(() => {
+        dispatch({
+          type: "LOGOUT_USER",
+        });
       });
-    });
   };
 }
 

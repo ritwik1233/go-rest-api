@@ -10,42 +10,22 @@ import UpdateMessageComponet from "./UpdateMessageComponent";
 
 function MessageContainer(props) {
   const dispatch = useDispatch();
-  const [userEmail, setUserEmail] = React.useState(null);
   const [updateMesasgeStatus, setUpdateMessage] = React.useState(false);
-  React.useEffect(() => {
-    axios
-      .get("/api/getCurrentUser", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: props.currentUserToken,
-        },
-      })
-      .then((res) => {
-        setUpdateMessage(false);
-        setUserEmail(res.data.result);
-      })
-      .catch(() => {
-        setUserEmail(null);
-      });
-  }, [props.currentUserToken]);
 
   const getComments = () => {
-    props.getComments(props.ID);
+    props.getComments(props._id);
   };
 
   const updateMessage = (message) => {
-    axios({
-      method: "put",
-      url: "api/updateMessage",
-      data: message,
-      params: {
-        messageId: props.ID,
-      },
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: props.currentUserToken,
-      },
-    })
+    axios
+      .put("api/updateMessage", message, {
+        params: {
+          messageId: props._id,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
       .then(() => {
         dispatch(getAllMessage());
         setUpdateMessage(false);
@@ -56,22 +36,19 @@ function MessageContainer(props) {
   };
 
   const deleteMessage = () => {
-    props.deleteMessage(props.ID);
+    props.deleteMessage(props._id);
   };
 
   const createComment = (commentData) => {
-    commentData.append("messageId", props.ID);
-    axios({
-      method: "post",
-      url: "api/createComment",
-      data: commentData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: props.currentUserToken,
-      },
-    })
+    commentData.messageId = props._id;
+    axios
+      .post("api/createComment", commentData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then(() => {
-        dispatch(getAllComments(props.ID));
+        dispatch(getAllComments(props._id));
         const createComment = document.getElementById("create-comment");
         createComment.reset();
       })
@@ -81,19 +58,17 @@ function MessageContainer(props) {
   };
 
   const deleteComment = (commentId) => {
-    axios({
-      method: "delete",
-      url: "api/deleteComment",
-      params: {
-        commentId,
-      },
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: props.currentUserToken,
-      },
-    })
+    axios
+      .delete("api/deleteComment", {
+        params: {
+          commentId,
+        },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then(() => {
-        dispatch(getAllComments(props.ID));
+        dispatch(getAllComments(props._id));
       })
       .catch((err) => {
         console.log(err);
@@ -101,20 +76,17 @@ function MessageContainer(props) {
   };
 
   const updateComment = (commentData, commentId) => {
-    axios({
-      method: "put",
-      url: "api/updateComment",
-      data: commentData,
-      params: {
-        commentId: commentId,
-      },
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: props.currentUserToken,
-      },
-    })
+    axios
+      .put("api/updateComment", commentData, {
+        params: {
+          commentId: commentId,
+        },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then(() => {
-        dispatch(getAllComments(props.ID));
+        dispatch(getAllComments(props._id));
       })
       .catch((err) => {
         console.log(err);
@@ -130,16 +102,16 @@ function MessageContainer(props) {
             <Grid container spacing={0}>
               <Grid item xs={10}>
                 {!updateMesasgeStatus ? (
-                  <Typography variant="body1">{props.Message}</Typography>
+                  <Typography variant="body1">{props.message}</Typography>
                 ) : (
                   <UpdateMessageComponet
                     updateMessage={updateMessage}
-                    Message={props.Message}
+                    Message={props.message}
                   />
                 )}
               </Grid>
 
-              {userEmail === props.CreatedBy && (
+              {props.currentUserToken === props.createdBy && (
                 <React.Fragment>
                   <Grid item xs={1}>
                     <Button
@@ -167,12 +139,12 @@ function MessageContainer(props) {
               )}
               <Grid item xs={8}></Grid>
               <Grid item xs={4}>
-                <Typography variant="caption">{props.CreatedBy}</Typography>
+                <Typography variant="caption">{props.createdBy}</Typography>
               </Grid>
               <Grid item xs={8}></Grid>
               <Grid item xs={4}>
                 <Typography variant="caption">
-                  {props.CreatedDate.toString()}
+                  {props.createdDate.toString()}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
@@ -183,7 +155,7 @@ function MessageContainer(props) {
               {props.viewComments && (
                 <CommentsContainer
                   comments={props.comments}
-                  userEmail={userEmail}
+                  currentUserToken={props.currentUserToken}
                   deleteComment={deleteComment}
                   createComment={createComment}
                   updateComment={updateComment}
@@ -207,10 +179,10 @@ function mapStateToProps(state) {
 
 // type checking for props
 MessageContainer.propTypes = {
-  ID: PropTypes.string,
-  Message: PropTypes.string,
-  CreatedBy: PropTypes.string,
-  CreatedDate: PropTypes.objectOf(Date),
+  _id: PropTypes.string,
+  message: PropTypes.string,
+  createdBy: PropTypes.string,
+  createdDate: PropTypes.objectOf(Date),
   comments: PropTypes.arrayOf(Object),
   viewComments: PropTypes.bool,
   currentUserToken: PropTypes.string,
@@ -220,10 +192,10 @@ MessageContainer.propTypes = {
 
 // setting default props
 MessageContainer.defaultProps = {
-  ID: "",
-  Message: "",
-  CreatedBy: "",
-  CreatedDate: null,
+  _id: "",
+  message: "",
+  createdBy: "",
+  createdDate: null,
   comments: [],
   viewComments: false,
   currentUserToken: null,

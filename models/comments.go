@@ -1,11 +1,15 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type CommentsCollection struct {
-	ID          string    `bson:"_id"`
-	Comment     string    `bson:"comment"`
-	MessageId   string    `bson:"messageId"`
-	CreatedBy   string    `bson:"createdBy"`
-	CreatedDate time.Time `bson:"createdDate"`
+	ID          primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	Comment     string             `json:"comment,omitempty" bson:"comment"`
+	MessageId   primitive.ObjectID `json:"messageId,omitempty" bson:"messageId"`
+	CreatedBy   string             `json:"createdBy,omitempty" bson:"createdBy"`
+	CreatedDate time.Time          `json:"createdDate,omitempty" bson:"createdDate"`
 }

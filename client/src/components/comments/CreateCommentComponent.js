@@ -5,8 +5,8 @@ import PropTypes from "prop-types";
 function CreateCommentComponent(props) {
   const createComment = (e) => {
     e.preventDefault();
-    const commentData = new FormData();
-    commentData.append("comment", e.target.comment.value);
+    const commentData = {};
+    commentData.comment = e.target.comment.value;
     props.createComment(commentData);
   };
 

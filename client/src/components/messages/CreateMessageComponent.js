@@ -5,8 +5,8 @@ import PropTypes from "prop-types";
 function CreateMessageComponent(props) {
   const handleCreateMessageSubmit = (e) => {
     e.preventDefault();
-    let messageDetails = new FormData();
-    messageDetails.append("message", e.target.message.value);
+    let messageDetails = {};
+    messageDetails.message = e.target.message.value;
     props.handleMessage(messageDetails);
   };
 

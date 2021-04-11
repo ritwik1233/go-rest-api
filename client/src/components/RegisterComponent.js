@@ -5,9 +5,9 @@ import PropTypes from "prop-types";
 function RegisterComponent(props) {
   const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    const registerDetails = new FormData();
-    registerDetails.append("email", e.target.email.value);
-    registerDetails.append("password", e.target.password.value);
+    const registerDetails = {};
+    registerDetails.email = e.target.email.value;
+    registerDetails.password = e.target.password.value;
     props.handleRegister(registerDetails);
   };
   return (

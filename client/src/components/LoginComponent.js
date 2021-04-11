@@ -5,9 +5,9 @@ import PropTypes from "prop-types";
 function LoginComponent(props) {
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    let loginDetails = new FormData();
-    loginDetails.append("email", e.target.email.value);
-    loginDetails.append("password", e.target.password.value);
+    let loginDetails = {};
+    loginDetails.email = e.target.email.value;
+    loginDetails.password = e.target.password.value;
     props.handleLogin(loginDetails);
   };
   return (

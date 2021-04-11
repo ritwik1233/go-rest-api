@@ -1,6 +1,6 @@
 const authReducer = function (state = { currentUserToken: null }, action) {
   switch (action.type) {
-    case "LOGIN_USER":
+    case "GET_USER":
       return { ...state, currentUserToken: action.payload };
     case "LOGOUT_USER":
       return { ...state, currentUserToken: null };
