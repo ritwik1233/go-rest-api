@@ -27,7 +27,6 @@ function Header(props) {
   };
 
   const handleLogin = (userDetails) => {
-    console.log(userDetails);
     axios
       .post("/api/login", userDetails, {
         headers: { "Content-Type": "application/json" },
